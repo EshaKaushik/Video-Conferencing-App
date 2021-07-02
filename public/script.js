@@ -353,20 +353,6 @@ function download(){
     window.URL.revokeObjectURL(url);
   }, 100);
 }
-downloadButton.addEventListener('click', () => {
-  const blob = new Blob(recordedBlobs, {type: 'video/webm'});
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.style.display = 'none';
-  a.href = url;
-  a.download = 'test.webm';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 100);
-});
 
 function handleDataAvailable(event) {
   console.log('handleDataAvailable', event);
@@ -418,7 +404,7 @@ function startRecording() {
 function stopRecording() {
   mediaRecorder.stop();
 }
-
+/*
 'use strict';
 
 
@@ -447,7 +433,7 @@ function errorMsg(msg, error) {
   }
 }
 
-const startButton = document.getElementById('startButton');
+const startButton = document.getElementById('record');
 startButton.addEventListener('click', () => {
   navigator.mediaDevices.getDisplayMedia({video: true})
       .then(handleSuccess, handleError);
@@ -458,3 +444,4 @@ if ((navigator.mediaDevices && 'getDisplayMedia' in navigator.mediaDevices)) {
 } else {
   errorMsg('getDisplayMedia is not supported');
 }
+*/
