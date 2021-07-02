@@ -3,13 +3,19 @@ const all_messages = document.getElementById("all_messages");
 const main__chat__window = document.getElementById("main__chat__window");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
+//
 myVideo.muted = true;
 var myUserId="";
+//
+
+
+//
 const peers={};
 const user_list=[];
 const user = prompt("Enter your name");
 if(user.trim().length ==0){
-  document.write("Enter the username is mandatory to create a room  ");  
+  document.write("Enter the username is mandatory to create a room  ");
+  
 }
 
 user_list.push(user);
@@ -49,6 +55,7 @@ navigator.mediaDevices
           peer.close();
         }
       };
+
     });
 
   socket.on("user-connected", (userId) => {
@@ -61,11 +68,11 @@ socket.on("user-disconnected", (userId) => {
   if (peers[userId]) peers[userId].close();
 });
 
-
+//me
 let chatInputBox = document.querySelector("#chat_message");
 let send = document.getElementById("send");
 let messages = document.querySelector(".messages");
-
+//
 send.addEventListener("click", (e) => {
   if (chatInputBox.value.length !== 0) {
     socket.emit("message", chatInputBox.value);
@@ -146,6 +153,7 @@ const connectToscreen = (userId, streams) => {
   var video = document.createElement("video");
   call.on("stream", (screenTrack) => {
     console.log(screenTrack);
+    //addVideoStream(video, screenTrack);
   });
   call.on("close", () => {
     video.remove();
@@ -273,19 +281,10 @@ inviteButton.addEventListener("click", (e) => {
 
 socket.on("success",()=>{
   console.log("success");
-  setTimeout(() => {alert("message successfully sent!!"); }, 3000);  
-});
-
-const submit_button = document.querySelector("#submit");
-submit_button.addEventListener("click", (e) => {
-  var mail_id="eshakaushik2001@gmail.com" ;
-  let feedbackInputBox = document.querySelector("#feedback_input");
-  console.log(mail_id);
-  console.log(feedbackInputBox.value);
-
-    //var link=window.location.href ;
-    socket.emit("mail_sent",mail_id, feedbackInputBox.value);
-
+  //wait(5000);
+  //prompt("Enter your name");
+  setTimeout(() => {  console.log("World!");alert("message successfully sent!!"); }, 3000);
+  
 });
 
 
@@ -293,12 +292,14 @@ var buttons = document.getElementById("showChat");
 buttons.addEventListener("click", (e) => {
   console.log("button isclicked");
   document.querySelector(".main__right").classList.toggle("click");
-    document.querySelector(".main__left").classList.toggle("click");
-    
+    document.querySelector(".main__left").classList.toggle("click");   
 
 });
 
 'use strict';
+
+/* globals MediaRecorder */
+
 let mediaRecorder;
 let recordedBlobs;
 
