@@ -24,7 +24,7 @@ console.log(user_list);
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
-  port: "8080",
+  port: "80",
 });
 
 let myVideoStream;
