@@ -3,10 +3,11 @@ var nodemailer = require('nodemailer');
 const app = express();
 const server = require("http").Server(app);
 const { v4: uuidv4 } = require("uuid");
-const io = require("socket.io")(server,{
-  cors: {
-    origin: '*'
-  }
+const io = require("socket.io")(server);
+const { ExpressPeerServer } = require("peer");
+const { Console } = require("console");
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
 });
 
 function sent_mail(mail_id,link){  
@@ -36,11 +37,7 @@ function sent_mail(mail_id,link){
 
   // Peer
 
-const { ExpressPeerServer } = require("peer");
-const { Console } = require("console");
-const peerServer = ExpressPeerServer(server, {
-  debug: true,
-});
+
 
 
 app.set("view engine", "ejs");
