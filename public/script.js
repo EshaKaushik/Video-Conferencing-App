@@ -1,48 +1,17 @@
-
-
-
 const socket = io("/");
-//const chatInputBox = document.getElementById("chat_message");
 const all_messages = document.getElementById("all_messages");
 const main__chat__window = document.getElementById("main__chat__window");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
-//
-//const showChat = document.querySelector("#showChat");
-//const backBtn = document.querySelector(".header__back");
 myVideo.muted = true;
 var myUserId="";
-//
-
-
-//
-/*
-
-
-
-backBtn.addEventListener("click", () => {
-  document.querySelector(".main__left").style.display = "flex";
-  document.querySelector(".main__left").style.flex = "1";
-  document.querySelector(".main__right").style.display = "none";
-  document.querySelector(".header__back").style.display = "none";
-});
-
-showChat.addEventListener("click", () => {
-  document.querySelector(".main__right").style.display = "flex";
-  document.querySelector(".main__right").style.flex = "1";
-  document.querySelector(".main__left").style.display = "none";
-  document.querySelector(".header__back").style.display = "block";
-});
-*/
 const peers={};
 const user_list=[];
 const user = prompt("Enter your name");
 if(user.trim().length ==0){
-  document.write("Enter the username is mandatory to create a room  ");
-  
+  document.write("Enter the username is mandatory to create a room  ");  
 }
 
-//const user = prompt("Enter your name");
 user_list.push(user);
 console.log(user_list);
 
@@ -80,7 +49,6 @@ navigator.mediaDevices
           peer.close();
         }
       };
-
     });
 
   socket.on("user-connected", (userId) => {
@@ -93,11 +61,11 @@ socket.on("user-disconnected", (userId) => {
   if (peers[userId]) peers[userId].close();
 });
 
-//me
+
 let chatInputBox = document.querySelector("#chat_message");
 let send = document.getElementById("send");
 let messages = document.querySelector(".messages");
-//
+
 send.addEventListener("click", (e) => {
   if (chatInputBox.value.length !== 0) {
     socket.emit("message", chatInputBox.value);
@@ -112,14 +80,24 @@ chatInputBox.addEventListener("keydown", (e) => {
 });
 
 socket.on("createMessage", (message, userName) => {
-  messages.innerHTML =
-    messages.innerHTML +
-    `<div class="message">
+  const receivedMsg = `
+  <div class="message_recieve" id ="msg">
         <b><i class="fa fa-user-circle"></i> <span> ${
-          userName === user ? "me" : userName
-        }</span> </b>
-        <span>${message}</span>
+           userName 
+        }</span> </b><br>
+        <span >&nbsp &nbsp&nbsp&nbsp${message}</span>
     </div>`;
+
+  const myMsg = `
+  <div class="message_sent" id ="msg">
+        <b><i class="fa fa-user-circle"></i> <span> ${
+           "me"
+        }</span> </b><br>
+        <span >&nbsp &nbsp&nbsp&nbsp${message}</span>
+    </div>`;
+
+  messages.innerHTML =messages.innerHTML + (user === userName ? myMsg : receivedMsg);
+  
 });
 
 
@@ -168,7 +146,6 @@ const connectToscreen = (userId, streams) => {
   var video = document.createElement("video");
   call.on("stream", (screenTrack) => {
     console.log(screenTrack);
-    //addVideoStream(video, screenTrack);
   });
   call.on("close", () => {
     video.remove();
@@ -176,32 +153,7 @@ const connectToscreen = (userId, streams) => {
 
   peers[userId] = call;
 };
-/*
-const connectToScreen = (streams) => {
-  console.log(streams);
-  var video = document.createElement("video");
-  addVideoStream(video, streams);
-*/
 
-
-
-
-  /*
-  var call = peer.call( streams);
-  console.log(call);
-  var video = document.createElement("video");
-  call.on("stream", (userVideoStream) => {
-    console.log(userVideoStream);
-    addVideoStream(video, userVideoStream);
-  });
-  
-  call.on("close",()=>{
-    video.remove();
-  });
-  peers[userId]=call;
-  
-};
-*/
 
 const addVideoStream = (videoEl, stream) => {
   videoEl.srcObject = stream;
@@ -219,20 +171,7 @@ const addVideoStream = (videoEl, stream) => {
     }
   }
 };
-/*
-function shareScreen () {
-  let captureStream = null;
 
-
-  try {
-    captureStream =  navigator.mediaDevices.getDisplayMedia();
-  } catch (err) {
-    console.error("Error: " + err);
-  }
-  // connectToNewUser(myUserId, captureStream);
-  peer.call( captureStream);
-};
-*/
 var screenTrack;
 function shareScreen() {
   navigator.mediaDevices.getDisplayMedia({ cursor: true }).then(stream => {
@@ -242,25 +181,7 @@ function shareScreen() {
        console.log(screenTrack);
       var video = document.createElement("video");
       addVideoStream(video, screenTrack);
-      socket.emit("initiate");
-     //socket.emit("initiate",stream);
-      //peer.call( screenTrack);
-      /*
-      peer.on("call", (call) => {
-        call.answer(stream);
-        const video = document.createElement("video");
-  
-        call.on("stream", (screenTrack) => {
-          addVideoStream(video, screenTrack);
-        });
-      */
-        //socket.emit("initiate");
-      //socket.on("initiate");
-      /*
-      call.on("stream", (screenTrack) => {
-        addVideoStream(video, screenTrack);
-      });*/
-      
+      socket.emit("initiate");      
   })
 }
 let share = document.getElementById("screen");
@@ -269,14 +190,6 @@ share.addEventListener("click", (e) =>{
   shareScreen();
   
 });
-/*
-socket.on("share-screen",() =>{
-  console.log("Sharing  screen ");
-  console.log(screenTrack);
-  var video = document.createElement("video");
-  addVideoStream(video, screenTrack);
-  console.log("Sharing  screen ");
-})*/
 
 socket.on("share-screen",() =>{
   console.log("Sharing  screen ");
@@ -285,17 +198,6 @@ socket.on("share-screen",() =>{
   console.log("Sharing  screen ");
 })
 
-
-/*
-socket.on("share-screen",(screenTrack) =>{
-  console.log("Sharing  screen ");
-  console.log(screenTrack);
-  var video = document.createElement("video");
-  addVideoStream(video, screenTrack);
-  console.log("Sharing  screen ");
-})
-
-*/
 const exit = () => {
   window.location.href = "/exit";
 };
@@ -312,6 +214,7 @@ const playStop = () => {
   if (enabled) {
     myVideoStream.getVideoTracks()[0].enabled = false;
     setPlayVideo();
+    
   } else {
     setStopVideo();
     myVideoStream.getVideoTracks()[0].enabled = true;
@@ -352,390 +255,50 @@ const setMuteButton = () => {
   document.getElementById("muteButton").innerHTML = html;
 };
 
-
-/*
-const showInvitePopup=() =>{
-  document.body.classList.toggle("showInvite");
-  document.getElementById("roomLink").value = window.location.href;
-}
-*/
+const leave = () => {
+  let want_to_leave = confirm("Are you sure you want to leave the meeting?");
+  if(want_to_leave)
+  {
+    window.location.replace("/feedback");
+  }
+};
 
 const inviteButton = document.querySelector("#inviteButton");
 inviteButton.addEventListener("click", (e) => {
-  prompt(
-    "Copy this link and send it to people you want to meet with",
-    window.location.href
-  );
+  var mail_id=prompt("Enter mail id",""); 
+    var link=window.location.href ;
+    socket.emit("mail_sent",mail_id, link);
+
 });
-/*
-const showChat = document.querySelector("#showChat");
-const ShowChat=(e)=>{
-  e.classList.toggle("active");
-  document.body.classList.toggle("showChat");
-};*/
-/*
-function showChat(){
-  document.getElementById("showChat").style.display="block";
-}
-*/
-/*  come to full screen
 
-showChat.addEventListener("click", () => {
-  document.querySelector(".main__right").style.display = "flex";
-  document.querySelector(".main__right").style.flex = "1";
-  document.querySelector(".main__left").style.display = "none";
-  document.querySelector(".header__back").style.display = "block";
-});*/
-/*
+socket.on("success",()=>{
+  console.log("success");
+  setTimeout(() => {alert("message successfully sent!!"); }, 3000);  
+});
 
-function closeCurrentTab(){
-  var conf=confirm("Are you sure, you want to close this tab?");
-  if(conf==true){
-    window.close();
-  }
-}
+const submit_button = document.querySelector("#submit");
+submit_button.addEventListener("click", (e) => {
+  var mail_id="eshakaushik2001@gmail.com" ;
+  let feedbackInputBox = document.querySelector("#feedback_input");
+  console.log(mail_id);
+  console.log(feedbackInputBox.value);
 
+    //var link=window.location.href ;
+    socket.emit("mail_sent",mail_id, feedbackInputBox.value);
 
-window.addEventListener( 'load', () => {
-  //When the chat icon is clicked
-  document.querySelector( '#showChat' ).addEventListener( 'click', ( e ) => {
-      let chatElem = document.querySelector( 'main__right' );
-      let mainSecElem = document.querySelector( 'main__left' );
-
-      if ( chatElem.classList.contains( 'chat-opened' ) ) {
-          chatElem.setAttribute( 'hidden', true );
-          mainSecElem.classList.remove( 'col-md-9' );
-          mainSecElem.classList.add( 'col-md-12' );
-          chatElem.classList.remove( 'chat-opened' );
-      }
-
-      else {
-          chatElem.attributes.removeNamedItem( 'hidden' );
-          mainSecElem.classList.remove( 'col-md-12' );
-          mainSecElem.classList.add( 'col-md-9' );
-          chatElem.classList.add( 'chat-opened' );
-      }
-} )});
-
-*/
-///print all users
-/*
-function shareScreen() {
-  h.shareScreen().then( ( stream ) => {
-      h.toggleShareIcons( true );
-
-      //disable the video toggle btns while sharing screen. This is to ensure clicking on the btn does not interfere with the screen sharing
-      //It will be enabled was user stopped sharing screen
-      h.toggleVideoBtnDisabled( true );
-
-      //save my screen stream
-      screen = stream;
-
-      //share the new stream with all partners
-      broadcastNewTracks( stream, 'video', false );
-
-      //When the stop sharing button shown by the browser is clicked
-      screen.getVideoTracks()[0].addEventListener( 'ended', () => {
-          stopSharingScreen();
-      } );
-  } ).catch( ( e ) => {
-      console.error( e );
-  } );
-}
-
-function stopSharingScreen() {
-  //enable video toggle btn
-  h.toggleVideoBtnDisabled( false );
-
-  return new Promise( ( res, rej ) => {
-      screen.getTracks().length ? screen.getTracks().forEach( track => track.stop() ) : '';
-
-      res();
-  } ).then( () => {
-      h.toggleShareIcons( false );
-      broadcastNewTracks( myStream, 'video' );
-  } ).catch( ( e ) => {
-      console.error( e );
-  } );
-}
-*/
-
-///////////// record
-/*
-let shouldStop = false;
-    let stopped = false;
-    const downloadLink = document.getElementById('download');
-    const stopButton = document.getElementById('stop');
-    function startRecord() {
-        $('.btn-info').prop('disabled', true);
-        $('#stop').prop('disabled', false);
-        $('#download').css('display', 'none')
-    }
-    function stopRecord() {
-        $('.btn-info').prop('disabled', false);
-        $('#stop').prop('disabled', true);
-        $('#download').css('display', 'block')
-    }
-    stopButton.addEventListener('click', function () {
-      shouldStop = true;
-  });
-
-
-const handleRecord = function ({stream, mimeType}) {
-  startRecord()
-  // to collect stream chunks
-  let recordedChunks = [];
-  stopped = false;
-  const mediaRecorder = new MediaRecorder(stream);
-
-  mediaRecorder.ondataavailable = function (e) {
-    if (e.data.size > 0) {
-      recordedChunks.push(e.data);
-    }
-    // shouldStop => forceStop by user
-    if (shouldStop === true && stopped === false) {
-      mediaRecorder.stop();
-      stopped = true;
-    }
-  };
-  mediaRecorder.onstop = function () {
-    const blob = new Blob(recordedChunks, {
-      type: mimeType
-    });
-    recordedChunks = []
-    const filename = window.prompt('Enter file name'); // input filename from user for download
-    downloadLink.href = URL.createObjectURL(blob); // create download link for the file
-    downloadLink.download = `${filename}.webm`; // naming the file with user provided name
-    stopRecord();
-    videoElement.srcObject = null;
-  };
-  mediaRecorder.start(200);
-}
-
-async function recordScreen() {
-  const mimeType = 'video/webm';
-  shouldStop = false;
-  const constraints = {
-    video: {cursor: 'motion'}
-  };
-  if(!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) {
-    return window.alert('Screen Record not supported!')
-}
-let stream = null;
-  const displayStream = await navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
-  // voiceStream for recording voice with screen recording
-  if(window.confirm("Record audio with screen?")){
-  const voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-  let tracks = [...displayStream.getTracks(), ...voiceStream.getAudioTracks()]
-   stream = new MediaStream(tracks);
-  handleRecord({stream, mimeType})
-}
-else {
-  stream = displayStream;
-  handleRecord({stream, mimeType});
-};
-videoElement.srcObject = stream;
-}
-
-
-
-
-
-var recordedStream = [];
-var mediaRecorder = '';
-
-function toggleRecordingIcons( isRecording ) {
-  let e = document.getElementById( 'record' );
-
-  if ( isRecording ) {
-      e.setAttribute( 'title', 'Stop recording' );
-      e.children[0].classList.add( 'text-danger' );
-      e.children[0].classList.remove( 'text-white' );
-  }
-
-  else {
-      e.setAttribute( 'title', 'Record' );
-      e.children[0].classList.add( 'text-white' );
-      e.children[0].classList.remove( 'text-danger' );
-  }
-}
-
-function startRecording( stream ) {
-  mediaRecorder = new MediaRecorder( stream, {
-      mimeType: 'video/webm;codecs=vp9'
-  } );
-
-  mediaRecorder.start( 1000 );
-  toggleRecordingIcons( true );
-
-  mediaRecorder.ondataavailable = function ( e ) {
-      recordedStream.push( e.data );
-  };
-
-  mediaRecorder.onstop = function () {
-      toggleRecordingIcons( false );
-
-      h.saveRecordedStream( recordedStream, username );
-
-      setTimeout( () => {
-          recordedStream = [];
-      }, 3000 );
-  };
-
-  mediaRecorder.onerror = function ( e ) {
-      console.error( e );
-  };
-}
-
-document.getElementById( 'share-screen' ).addEventListener( 'click', ( e ) => {
-  e.preventDefault();
-
-  if ( screen && screen.getVideoTracks().length && screen.getVideoTracks()[0].readyState != 'ended' ) {
-      stopSharingScreen();
-  }
-
-  else {
-      shareScreen();
-  }
-} );
-
-
-document.getElementById( 'record' ).addEventListener( 'click', ( e ) => {
-  /**
-   * Ask user what they want to record.
-   * Get the stream based on selection and start recording
-   */
-  /*
-  if ( !mediaRecorder || mediaRecorder.state == 'inactive' ) {
-      h.toggleModal( 'recording-options-modal', true );
-  }
-
-  else if ( mediaRecorder.state == 'paused' ) {
-      mediaRecorder.resume();
-  }
-
-  else if ( mediaRecorder.state == 'recording' ) {
-      mediaRecorder.stop();
-  }
 });
 
 
-//When user choose to record screen
-  document.getElementById( 'record-screen' ).addEventListener( 'click', () => {
-    h.toggleModal( 'recording-options-modal', false );
+var buttons = document.getElementById("showChat");
+buttons.addEventListener("click", (e) => {
+  console.log("button isclicked");
+  document.querySelector(".main__right").classList.toggle("click");
+    document.querySelector(".main__left").classList.toggle("click");
+    
 
-    if ( screen && screen.getVideoTracks().length ) {
-        startRecording( screen );
-    }
-
-    else {
-        h.shareScreen().then( ( screenStream ) => {
-            startRecording( screenStream );
-        } ).catch( () => { } );
-    }
-  } );
-
-
-//When user choose to record own video
-document.getElementById( 'record-video' ).addEventListener( 'click', () => {
-  h.toggleModal( 'recording-options-modal', false );
-
-  if ( myStream && myStream.getTracks().length ) {
-      startRecording( myStream );
-  }
-
-  else {
-      h.getUserFullMedia().then( ( videoStream ) => {
-          startRecording( videoStream );
-      } ).catch( () => { } );
-  }
 });
-}};
-*/
-/*
-const stunServerConfig = {
-  iceServers: [{
-    url: 'turn:13.250.13.83:3478?transport=udp',
-    username: "YzYNCouZM1mhqhmseWk6",
-    credential: "YzYNCouZM1mhqhmseWk6"
-  }]
-};
-
-
-
-var initiateBtn = document.getElementById('initiateBtn');
-var stopBtn = document.getElementById('stopBtn');
-var initiator = false;
-
-
-
-initiateBtn.onclick = (e) => {
-  console.log("Screen Shared");
-  initiator = true;
-  socket.emit('initiate');
-}
-
-stopBtn.onclick = (e) => {
-  socket.emit('initiate');
-}
-
-socket.on('initiate', () => {
-  startStream();
-  initiateBtn.style.display = 'none';
-  stopBtn.style.display = 'block';
-})
-
-function startStream () {
-  if (initiator) {
-    // get screen stream
-    navigator.mediaDevices.getDisplayMedia({
-      video: {
-        mediaSource: "screen",
-        width: { max: '1920' },
-        height: { max: '1080' },
-        frameRate: { max: '10' }
-      }
-    }).then(gotMedia);
-  } else {
-    gotMedia(null);
-  }
-}
-
-function gotMedia (stream) {
-  if (initiator) {
-    var peer = new Peer({
-      initiator,
-      stream,
-      config: stunServerConfig
-    });
-  } else {
-    var peer = new Peer({
-      config: stunServerConfig
-    });
-  }
-
-  peer.on('signal', function (data) {
-    socket.emit('offer', JSON.stringify(data));
-  });
-
-  socket.on('offer', (data) => {
-    peer.signal(JSON.parse(data));
-  })
-
-  peer.on('stream', function (stream) {
-    // got remote video stream, now let's show it in a video tag
-    var video = document.querySelector('video');
-    video.srcObject = stream;
-    video.play();
-  })
-}
-*/
-
 
 'use strict';
-
-/* globals MediaRecorder */
-
 let mediaRecorder;
 let recordedBlobs;
 
@@ -774,17 +337,7 @@ recordButton.addEventListener('click', () => {
   }
   
 });
-/*
-const playButton = document.querySelector('button#play');
-playButton.addEventListener('click', () => {
-  const mimeType = codecPreferences.options[codecPreferences.selectedIndex].value.split(';', 1)[0];
-  const superBuffer = new Blob(recordedBlobs, {type: mimeType});
-  recordedVideo.src = null;
-  recordedVideo.srcObject = null;
-  recordedVideo.src = window.URL.createObjectURL(superBuffer);
-  recordedVideo.controls = true;
-  recordedVideo.play();
-});*/
+
 function download(){
   const blob = new Blob(recordedBlobs, {type: 'video/webm'});
   const url = window.URL.createObjectURL(blob);
@@ -864,51 +417,6 @@ function startRecording() {
 function stopRecording() {
   mediaRecorder.stop();
 }
-/*
-function handleSuccess(stream) {
-  recordButton.disabled = false;
-  console.log('getUserMedia() got stream:', stream);
-  window.stream = stream;
-
-  const gumVideo = document.querySelector('#video-grid');
-  gumVideo.srcObject = stream;
-
-  getSupportedMimeTypes().forEach(mimeType => {
-    const option = document.createElement('option');
-    option.value = mimeType;
-    option.innerText = option.value;
-    codecPreferences.appendChild(option);
-  });
-  codecPreferences.disabled = false;
-}
-
-async function init(constraints) {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    handleSuccess(stream);
-  } catch (e) {
-    console.error('navigator.getUserMedia error:', e);
-    errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
-  }
-}
-
-
-document.querySelector('button#record').addEventListener('click', async () => {
-  document.querySelector('button#record').disabled = true;
-  //const hasEchoCancellation = document.querySelector('#echoCancellation').checked;
-  const constraints = {
-    audio: {
-      //echoCancellation: {exact: hasEchoCancellation}
-    },
-    video: {
-      width: 1280, height: 720
-    }
-  };
-  console.log('Using media constraints:', constraints);
-  await init(constraints);
-});
-*/
-
 
 'use strict';
 
@@ -949,5 +457,3 @@ if ((navigator.mediaDevices && 'getDisplayMedia' in navigator.mediaDevices)) {
 } else {
   errorMsg('getDisplayMedia is not supported');
 }
-
-
