@@ -9,6 +9,15 @@ const { Console } = require("console");
 const peerServer = ExpressPeerServer(server, {
   debug: true,
 });
+var cors = require('cors');
+app.use(cors({
+  'allowedHeaders': ['sessionId', 'Content-Type'],
+  'exposedHeaders': ['sessionId'],
+  'origin': '*',
+  'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  'preflightContinue': false
+}));
+
 
 function sent_mail(mail_id,link){  
   var transporter = nodemailer.createTransport({
