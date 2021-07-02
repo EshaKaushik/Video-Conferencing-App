@@ -23,7 +23,6 @@ console.log(user_list);
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
-  secure: true,
   host: "video-conferencing-webapp.herokuapp.com",
   port: 80,
 });
