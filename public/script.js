@@ -23,9 +23,9 @@ console.log(user_list);
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
-  host: "/",
-  port: "80",
-  proxied: true
+  host: "video-conferencing-webapp.herokuapp.com",
+  port: 443,
+  secure: true,
 });
 
 let myVideoStream;
