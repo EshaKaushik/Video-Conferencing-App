@@ -24,6 +24,7 @@ console.log(user_list);
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
+  secure:false,
   port: "80",
 });
 

@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/6183569e-6d59-494d-9528-f9cc15763569/resourceGroups/video-call-app/providers/Microsoft.Web/sites/video-call-app",
+    "appService.deploySubpath": "."
+}
