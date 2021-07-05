@@ -65,9 +65,13 @@ app.get("/:room", (req, res) => {
   console.log(roomId);
   res.render("room", { roomId: req.params.room });
 });
-
+const users = {};
 io.on("connection", (socket) => {
+  
   socket.on("join-room", (roomId, userId,userName) => {
+    if(!users[socket.id]){
+      users[socket.id]=userName;
+    }
     socket.join(roomId);
     socket.to(roomId).broadcast.emit("user-connected", userId);
 
@@ -75,6 +79,11 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("createMessage", message,userName);
     });
 
+    socket.on("disconnect", () => {
+      io.to(roomId).emit('userLeft', userName);
+      delete users[socket.id];
+      console.log(users);
+    });
     
     socket.on('offer', (data) => {
       socket.broadcast.emit('offer', data);

@@ -14,8 +14,7 @@ const peers={};
 const user_list=[];
 const user = prompt("Enter your name");
 if(user.trim().length ==0){
-  document.write("Enter the username is mandatory to create a room  ");
-  
+  document.write("Enter the username is mandatory to create a room  ");  
 }
 
 user_list.push(user);
@@ -142,6 +141,7 @@ const connectToNewUser = (userId, streams) => {
   });
   call.on("close", () => {
     video.remove();
+    socket.emit(disconnect);
   });
 
   peers[userId] = call;
@@ -180,24 +180,27 @@ const addVideoStream = (videoEl, stream) => {
     }
   }
 };
-
-var screenTrack;
+let share = document.getElementById("screen");
 function shareScreen() {
-  navigator.mediaDevices.getDisplayMedia({ cursor: true }).then(stream => {
+  navigator.mediaDevices.getDisplayMedia({ cursor: "true" ,video:true }).then(stream => {
 
        screenTrack = stream;
-       console.log("inthe sharescreen func");
-       console.log(screenTrack);
       var video = document.createElement("video");
       addVideoStream(video, screenTrack);
-      socket.emit("initiate");      
+      socket.emit("initiate");    
+      
+      stream.getVideoTracks()[0].onended = function () {
+        share.textContent = 'Share Screen';
+      };
   })
 }
-let share = document.getElementById("screen");
+
+
 share.addEventListener("click", (e) =>{
-  console.log("Screen Shared-1"); 
-  shareScreen();
-  
+  if (share.textContent === 'Share Screen') {
+    share.textContent = 'Sharing';
+    shareScreen();
+  } 
 });
 
 socket.on("share-screen",() =>{
@@ -266,11 +269,17 @@ const setMuteButton = () => {
 
 const leave = () => {
   let want_to_leave = confirm("Are you sure you want to leave the meeting?");
+  socket.emit("disconnect");      
   if(want_to_leave)
   {
     window.location.replace("/feedback");
   }
 };
+
+socket.on('userLeft', (userName) =>{
+  console.log("disconnect client");
+  alert(userName+' has left the meeting');
+});
 
 const inviteButton = document.querySelector("#inviteButton");
 inviteButton.addEventListener("click", (e) => {
@@ -282,18 +291,14 @@ inviteButton.addEventListener("click", (e) => {
 
 socket.on("success",()=>{
   console.log("success");
-  //wait(5000);
-  //prompt("Enter your name");
-  setTimeout(() => {  console.log("World!");alert("message successfully sent!!"); }, 3000);
-  
+  setTimeout(() => {  console.log("World!");alert("message successfully sent!!"); }, 3000);  
 });
 
 
 var buttons = document.getElementById("showChat");
 buttons.addEventListener("click", (e) => {
-  console.log("button isclicked");
   document.querySelector(".main__right").classList.toggle("click");
-    document.querySelector(".main__left").classList.toggle("click");   
+  document.querySelector(".main__left").classList.toggle("click");   
 
 });
 
@@ -330,9 +335,13 @@ recordButton.addEventListener('click', () => {
 
   if (recordButton.textContent === 'Start Recording') {
     startRecording();
+    document.getElementById("record-icon").style.color = "red";
+
   } else {
     stopRecording();
     recordButton.textContent = 'Start Recording';
+    document.getElementById("record-icon").style.color = "white";
+
     
    // downloadButton.disabled = false;
     codecPreferences.disabled = false;
