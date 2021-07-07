@@ -14,6 +14,10 @@ This is a conference call application where users can call other user with featu
 ## Features and Functionalities 😃
 
 - Video Call with multiple participants
+- Chat feature working without disrupting flow of meeting
+    - View & Send messages.
+    -Continue the conversation after the meeting.
+    -Start the conversation before the meeting.
 - Toggling of video stream
 - Toggling of audio stream (mute & unmute)
 - Screen sharing
@@ -25,7 +29,10 @@ This is a conference call application where users can call other user with featu
 
 
 ## Screenshots 📸
-
+#### First landing page -   
+#### Main Chat page -
+#### In video-conferencing-call -
+#### Feedback Page -
 ## Tech Stack 💻
 
 - [Heroku (Hosting)](https://www.heroku.com)

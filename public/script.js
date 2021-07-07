@@ -3,23 +3,16 @@ const all_messages = document.getElementById("all_messages");
 const main__chat__window = document.getElementById("main__chat__window");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
-//
+
 myVideo.muted = true;
 var myUserId="";
-//
-
-
-//
-const peers={};
-const user_list=[];
+var peers={};
 const user = prompt("Enter your name");
 if(user.trim().length ==0){
   document.write("Enter the username is mandatory to create a room  ");  
 }
 
-user_list.push(user);
-console.log(user_list);
-
+/// Declaring the peers
 var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "video-conferencing-webapp.herokuapp.com",
@@ -27,20 +20,17 @@ var peer = new Peer(undefined, {
   secure: true,
 });
 
+ 
 let myVideoStream;
+var getUserMedia =  navigator.getUserMedia ||  navigator.webkitGetUserMedia ||  navigator.mozGetUserMedia;
 
-var getUserMedia =
-  navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia;
-
-navigator.mediaDevices
-  .getUserMedia({
+navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true,
   })
   .then((stream) => {
     myVideoStream = stream;
+    myVideoStream.getAudioTracks()[0].enabled = false;
     addVideoStream(myVideo, stream);
 
     peer.on("call", (call) => {
@@ -57,49 +47,105 @@ navigator.mediaDevices
       };
 
     });
-
   socket.on("user-connected", (userId) => {
     myUserId=userId;
     connectToNewUser(userId, stream);
   });
 });
 
+
+////// Getting connected team members list 
+const userList = document.getElementById('users');
+socket.on('Users', ({ users }) => {
+  //outputRoomName(room);
+  outputUsers(users);
+});
+
+function outputUsers(users) {
+  userList.innerHTML = '';
+  users.forEach((user) => {
+    const li = document.createElement('li');
+    li.innerText = user.username;
+    userList.appendChild(li);
+  });
+}
+
+// When new user is connecting
+const connectToNewUser = (userId, streams) => {
+  var call = peer.call(userId, streams);
+  console.log(call);
+  var video = document.createElement("video");
+  call.on("stream", (userVideoStream) => {
+    addVideoStream(video, userVideoStream);
+  });
+  peers[userId] = call;
+};
+
+
+// Adding a new video-stream to the video-grid 
+const addVideoStream = (videoEl, stream) => {
+  videoEl.srcObject = stream;
+  videoEl.addEventListener("loadedmetadata", () => {
+    videoEl.play();
+
+  });
+
+  videoGrid.append(videoEl);
+  let totalUsers = document.getElementsByTagName("video").length;
+  if (totalUsers > 1) {
+    for (let index = 0; index < totalUsers; index++) {
+      document.getElementsByTagName("video")[index].style.width =
+        100 / totalUsers + "%";
+    }
+  }
+};
+
+
+/// Join the video conference meeting by clicking on Join button in Main page
+const join_meet=document.getElementById("join-video");
+join_meet.addEventListener("click", (e) =>{
+  document.querySelector(".main__right").classList.toggle("click");
+  document.querySelector(".main__left").classList.toggle("click"); 
+});
 socket.on("user-disconnected", (userId) => {
   if (peers[userId]) peers[userId].close();
 });
 
-//me
+
+////////////// CHAT BOX FUNCTIONALITY
 let chatInputBox = document.querySelector("#chat_message");
 let send = document.getElementById("send");
 let messages = document.querySelector(".messages");
 //
 send.addEventListener("click", (e) => {
+  var time=moment().format('h:mm a');
   if (chatInputBox.value.length !== 0) {
-    socket.emit("message", chatInputBox.value);
+    socket.emit("message", chatInputBox.value,time);
     chatInputBox.value = "";
   }
 });
 chatInputBox.addEventListener("keydown", (e) => {
+  var time=moment().format(' MMMM Do YYYY, h:mm a');
   if (e.key === "Enter" && chatInputBox.value != "") {
-    socket.emit("message", chatInputBox.value);
+    socket.emit("message", chatInputBox.value,time);
     chatInputBox.value = "";
   }
 });
 
-socket.on("createMessage", (message, userName) => {
+socket.on("createMessage", (message, userName,time) => {
   const receivedMsg = `
   <div class="message_recieve" id ="msg">
         <b><i class="fa fa-user-circle"></i> <span> ${
            userName 
-        }</span> </b><br>
-        <span >&nbsp &nbsp&nbsp&nbsp${message}</span>
+        }</span> </b> &nbsp &nbsp <span class="time">${time}</span><br>
+        <span class="message">&nbsp &nbsp&nbsp&nbsp${message}</span>
     </div>`;
 
   const myMsg = `
   <div class="message_sent" id ="msg">
         <b><i class="fa fa-user-circle"></i> <span> ${
            "me"
-        }</span> </b><br>
+        }</span></b> &nbsp &nbsp<span class="time">${time}</span><br>
         <span >&nbsp &nbsp&nbsp&nbsp${message}</span>
     </div>`;
 
@@ -107,7 +153,17 @@ socket.on("createMessage", (message, userName) => {
   
 });
 
-
+//// When chat button is clicked it shows the history of chat 
+var buttons = document.getElementById("showChat");
+var discontinue = document.getElementById("discontinue");
+buttons.addEventListener("click", (e) => {
+  document.querySelector(".main__right").classList.toggle("click");
+  document.querySelector(".main__left").classList.toggle("click");
+});
+discontinue.addEventListener("click", (e) => {
+  document.querySelector(".main__right").classList.toggle("click");
+  document.querySelector(".main__left").classList.toggle("click");
+});
 
 peer.on("call", function (call) {
   getUserMedia(
@@ -129,57 +185,22 @@ peer.on("open", (id) => {
   socket.emit("join-room", ROOM_ID, id,user);
 });
 
-// CHAT
 
-const connectToNewUser = (userId, streams) => {
-  var call = peer.call(userId, streams);
-  console.log(call);
-  var video = document.createElement("video");
-  call.on("stream", (userVideoStream) => {
-    console.log(userVideoStream);
-    addVideoStream(video, userVideoStream);
-  });
-  call.on("close", () => {
-    video.remove();
-    socket.emit(disconnect);
-  });
 
-  peers[userId] = call;
-
-};
+// Called when screen is shared in the meeting 
 const connectToscreen = (userId, streams) => {
   var call = peer.call(userId, streams);
-  console.log(streams);
-  console.log(call);
   var video = document.createElement("video");
   call.on("stream", (screenTrack) => {
     console.log(screenTrack);
-    //addVideoStream(video, screenTrack);
   });
   call.on("close", () => {
     video.remove();
   });
-
   peers[userId] = call;
 };
 
-
-const addVideoStream = (videoEl, stream) => {
-  videoEl.srcObject = stream;
-  videoEl.addEventListener("loadedmetadata", () => {
-    videoEl.play();
-
-  });
-
-  videoGrid.append(videoEl);
-  let totalUsers = document.getElementsByTagName("video").length;
-  if (totalUsers > 1) {
-    for (let index = 0; index < totalUsers; index++) {
-      document.getElementsByTagName("video")[index].style.width =
-        100 / totalUsers + "%";
-    }
-  }
-};
+/// Share screen functionality
 let share = document.getElementById("screen");
 function shareScreen() {
   navigator.mediaDevices.getDisplayMedia({ cursor: "true" ,video:true }).then(stream => {
@@ -194,15 +215,12 @@ function shareScreen() {
       };
   })
 }
-
-
 share.addEventListener("click", (e) =>{
   if (share.textContent === 'Share Screen') {
     share.textContent = 'Sharing';
     shareScreen();
   } 
 });
-
 socket.on("share-screen",() =>{
   console.log("Sharing  screen ");
   console.log(screenTrack);
@@ -210,23 +228,14 @@ socket.on("share-screen",() =>{
   console.log("Sharing  screen ");
 })
 
-const exit = () => {
-  window.location.href = "/exit";
-};
-
-const copyInfo = () => {
-  navigator.clipboard.writeText(window.location.href);
-};
 
 
-
-
+/// This section deals with the toggling of audio and video track
 const playStop = () => {
   let enabled = myVideoStream.getVideoTracks()[0].enabled;
   if (enabled) {
     myVideoStream.getVideoTracks()[0].enabled = false;
-    setPlayVideo();
-    
+    setPlayVideo();    
   } else {
     setStopVideo();
     myVideoStream.getVideoTracks()[0].enabled = true;
@@ -267,44 +276,34 @@ const setMuteButton = () => {
   document.getElementById("muteButton").innerHTML = html;
 };
 
-const leave = () => {
-  let want_to_leave = confirm("Are you sure you want to leave the meeting?");
-  socket.emit("disconnect");      
-  if(want_to_leave)
-  {
-    window.location.replace("/feedback");
-  }
-};
 
-socket.on('userLeft', (userName) =>{
-  console.log("disconnect client");
-  alert(userName+' has left the meeting');
-});
 
+
+// Invite a guest in your meeting 
 const inviteButton = document.querySelector("#inviteButton");
 inviteButton.addEventListener("click", (e) => {
   var mail_id=prompt("Enter mail id",""); 
     var link=window.location.href ;
     socket.emit("mail_sent",mail_id, link);
-
 });
 
+// Invite a new member to your team 
+const inviteButton2 = document.querySelector("#inviteButton_chat");
+inviteButton2.addEventListener("click", (e) => {
+  var mail_id=prompt("Enter mail id",""); 
+    var link=window.location.href ;
+    socket.emit("mail_sent",mail_id, link);
+
+});
 socket.on("success",()=>{
   console.log("success");
   setTimeout(() => {  console.log("World!");alert("message successfully sent!!"); }, 3000);  
 });
 
 
-var buttons = document.getElementById("showChat");
-buttons.addEventListener("click", (e) => {
-  document.querySelector(".main__right").classList.toggle("click");
-  document.querySelector(".main__left").classList.toggle("click");   
-
-});
+//// SCREEN RECORDING FUNCTIONALITY
 
 'use strict';
-
-/* globals MediaRecorder */
 
 let mediaRecorder;
 let recordedBlobs;
@@ -341,9 +340,6 @@ recordButton.addEventListener('click', () => {
     stopRecording();
     recordButton.textContent = 'Start Recording';
     document.getElementById("record-icon").style.color = "white";
-
-    
-   // downloadButton.disabled = false;
     codecPreferences.disabled = false;
   }
   
@@ -414,44 +410,19 @@ function startRecording() {
 function stopRecording() {
   mediaRecorder.stop();
 }
-/*
-'use strict';
 
 
-function handleSuccess(stream) {
-  startButton.disabled = true;
-  const video = document.querySelector('video');
-  video.srcObject = stream;
-
-  // demonstrates how to detect that the user has stopped
-  // sharing the screen via the browser UI.
-  stream.getVideoTracks()[0].addEventListener('ended', () => {
-    errorMsg('The user has ended sharing the screen');
-    startButton.disabled = false;
-  });
-}
-
-function handleError(error) {
-  errorMsg(`getDisplayMedia error: ${error.name}`, error);
-}
-
-function errorMsg(msg, error) {
-  const errorElement = document.querySelector('#errorMsg');
-  errorElement.innerHTML += `<p>${msg}</p>`;
-  if (typeof error !== 'undefined') {
-    console.error(error);
+//// When someone leaves that room 
+const leave = () => {
+  let want_to_leave = confirm("Are you sure you want to leave the team?");        
+  if(want_to_leave)
+  {
+    socket.emit("disconnect");
+    window.location.replace("/feedback");
   }
-}
+};
 
-const startButton = document.getElementById('record');
-startButton.addEventListener('click', () => {
-  navigator.mediaDevices.getDisplayMedia({video: true})
-      .then(handleSuccess, handleError);
+socket.on('userLeft', (userName) =>{
+  console.log("disconnect client");
+  alert(userName+' has left the meeting');
 });
-
-if ((navigator.mediaDevices && 'getDisplayMedia' in navigator.mediaDevices)) {
-  startButton.disabled = false;
-} else {
-  errorMsg('getDisplayMedia is not supported');
-}
-*/

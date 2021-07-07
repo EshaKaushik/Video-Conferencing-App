@@ -8,25 +8,27 @@ const io = require("socket.io")(server,{
     origin: '*'
   }
 });
+const {  userJoin,getCurrentUser,userLeave,getUsers} = require('./utils/users');
 const { ExpressPeerServer } = require("peer");
 const { Console } = require("console");
 const peerServer = ExpressPeerServer(server, {
   debug: true,
 });
 
+// Function to send an invitation mail to team members 
 function sent_mail(mail_id,link){  
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'eshakaushik2001@gmail.com',
-      pass: 'Esha@20032001'
+      user: 'esha20032001@gmail.com',
+      pass: 'Esha@123'
     }
   });
 
   var mailOptions = {
-    from: 'eshakaushik2001@gmail.com',
+    from: 'esha20032001@gmail.com',
     to: mail_id,
-    subject: 'This message has been send by Esha Kaushik for joining the meeting',
+    subject: 'Invitation link to join the team !!',
     text:link
   };
 
@@ -39,55 +41,56 @@ function sent_mail(mail_id,link){
   });
 };
 
-  // Peer
-
-
-
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/peerjs", peerServer);
 app.engine('html', require('ejs').renderFile);
+
+// Render the first landing page
 app.get('/', function(req, res) {
   res.render("index.html");
 });
 
+// Render the feedback form after leaving the call
 app.get('/feedback', function(req, res) {
   res.render("feedback.html");
 });
 
+// Creating a unique ID for new room 
 app.get("/direct", (req, rsp) => {
   rsp.redirect(`/${uuidv4()}`);
 });
 
+// Joining the room generated via unique Id 
 app.get("/:room", (req, res) => {
   roomId=`/${uuidv4()}`;
   console.log(roomId);
   res.render("room", { roomId: req.params.room });
 });
-const users = {};
-io.on("connection", (socket) => {
-  
+
+
+// When connection happens 
+io.on("connection", (socket) => {  
   socket.on("join-room", (roomId, userId,userName) => {
-    if(!users[socket.id]){
-      users[socket.id]=userName;
-    }
+    const user = userJoin(socket.id, userName, roomId);
     socket.join(roomId);
     socket.to(roomId).broadcast.emit("user-connected", userId);
-
-    socket.on("message", (message) => {
-      io.to(roomId).emit("createMessage", message,userName);
+    io.to(roomId).emit('Users',{
+      users:getUsers(roomId)
     });
 
-    socket.on("disconnect", () => {
+    socket.on("message", (message,time) => {
+      io.to(roomId).emit("createMessage", message,userName,time);
+    });
+
+    /*socket.on("disconnect", () => {
+      const user = userLeave(socket.id);
       io.to(roomId).emit('userLeft', userName);
-      delete users[socket.id];
-      console.log(users);
-    });
-    
-    socket.on('offer', (data) => {
-      socket.broadcast.emit('offer', data);
-    });
+      io.to(roomId).emit('Users',{
+        users:getUsers(roomId)
+      });
+    });*/
   
     socket.on("initiate", () => {
       io.to(roomId).emit("share-screen");
@@ -96,7 +99,7 @@ io.on("connection", (socket) => {
     socket.on("mail_sent",(mail_id,link) =>{
       sent_mail(mail_id,link);
       io.to(roomId).emit("success");
-    });
+    });    
   });
 });
 
