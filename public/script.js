@@ -282,7 +282,7 @@ const setMuteButton = () => {
 // Invite a guest in your meeting 
 const inviteButton = document.querySelector("#inviteButton");
 inviteButton.addEventListener("click", (e) => {
-  var mail_id=prompt("Enter mail id",""); 
+  var mail_id=prompt("Please enter mail id of guest that you want to invite",""); 
     var link=window.location.href ;
     socket.emit("mail_sent",mail_id, link);
 });
@@ -290,7 +290,7 @@ inviteButton.addEventListener("click", (e) => {
 // Invite a new member to your team 
 const inviteButton2 = document.querySelector("#inviteButton_chat");
 inviteButton2.addEventListener("click", (e) => {
-  var mail_id=prompt("Enter mail id",""); 
+  var mail_id=prompt("Please enter mail id of team member that you want to invite",""); 
     var link=window.location.href ;
     socket.emit("mail_sent",mail_id, link);
 
