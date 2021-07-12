@@ -1,12 +1,12 @@
 # ✨ Video-Conferencing-App  ✨
 
 
-This is a conference call application where users can call other user with features of integrated the features of multiple participants, real-time video-audio communication, screen sharing, meeting recording, toggling of video/audio stream, real-time chat communication
+This is a conference call application where users can call other user with features of integrated the features of multiple participants, real-time video-audio communication,conversation over chat before, during and after the meeting without disrupting flow of the meeting, screen sharing, meeting recording, toggling of video/audio stream.
 
-## This video conferencing application has been developed for the accomplishment of Microsoft Engage’21 Phase-2 challenge.
+## This video conferencing application has been developed for the accomplishment of Microsoft Engage’21 Phase-2 challenge following agile methodology principles.
 
 
-**Project Link** - 
+**Project Link** - https://video-conferencing-webapp.herokuapp.com/
 
 
 **Demo Video** - 
@@ -16,8 +16,8 @@ This is a conference call application where users can call other user with featu
 - Video Call with multiple participants
 - Chat feature working without disrupting flow of meeting
     - View & Send messages.
-    -Continue the conversation after the meeting.
-    -Start the conversation before the meeting.
+    - Continue the conversation after the meeting.
+    - Start the conversation before the meeting.
 - Toggling of video stream
 - Toggling of audio stream (mute & unmute)
 - Screen sharing
@@ -29,10 +29,14 @@ This is a conference call application where users can call other user with featu
 
 
 ## Screenshots 📸
-#### First landing page -   
-#### Main Chat page -
-#### In video-conferencing-call -
-#### Feedback Page -
+### First page -   
+![](public/images/ss_first_page.png)
+### Main Chat page -
+![](public/images/ss_main_chat_page.png)
+### In video-conferencing-call -
+![](public/images/ss_conference_page.png)
+### Feedback Page -
+![](public/images/ss_feedback_page.png)
 ## Tech Stack 💻
 
 - [Heroku (Hosting)](https://www.heroku.com)
