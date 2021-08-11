@@ -20,13 +20,13 @@ function sent_mail(mail_id,link){
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'eshakaushik2001@gmail.com',
-      pass: 'Esha@20032001'
+      user: '**username**',
+      pass: '**password**'
     }
   });
 
   var mailOptions = {
-    from: 'eshakaushik2001@gmail.com',
+    from: '**user_mailID**',
     to: mail_id,
     subject: 'Invitation link to join the team !!',
     text:link
