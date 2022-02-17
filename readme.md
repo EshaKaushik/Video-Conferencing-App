@@ -33,8 +33,6 @@ This is a conference call application where users can call other user with featu
 ![](public/images/ss_first_page.png)
 ### Main Chat page -
 ![](public/images/ss_main_chat_page.png)
-### In video-conferencing-call -
-![](public/images/ss_conference_page.png)
 ### Feedback Page -
 ![](public/images/ss_feedback_page.png)
 ## Tech Stack 💻
