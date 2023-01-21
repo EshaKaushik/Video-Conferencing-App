@@ -29,12 +29,15 @@ This is a conference call application where users can call other user with featu
 
 
 ## Screenshots 📸
-### First page -   
-![](public/images/ss_first_page.png)
+### First page -  
+<img width="931" alt="ss_first_page" src="https://user-images.githubusercontent.com/64471836/213856904-4632d157-7526-4fb7-bba1-1fa8d4f26021.png">
+
 ### Main Chat page -
-![](public/images/ss_main_chat_page.png)
+<img width="960" alt="ss_main_chat_page" src="https://user-images.githubusercontent.com/64471836/213857401-fe281fcf-f2fb-4fa5-9a4a-d42964a31c10.png">
+
 ### Feedback Page -
-![](public/images/ss_feedback_page.png)
+<img width="947" alt="ss_feedback_page" src="https://user-images.githubusercontent.com/64471836/213857892-ece9a123-5eaf-47c7-b873-f341cc6a6507.png">
+
 ## Tech Stack 💻
 
 - [Heroku (Hosting)](https://www.heroku.com)
