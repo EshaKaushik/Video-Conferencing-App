@@ -6,7 +6,7 @@ This is a conference call application where users can call other user with featu
 ## This video conferencing application has been developed for the accomplishment of Microsoft Engage’21 Phase-2 challenge following agile methodology principles.
 
 
-**Project Link** - https://video-conferencing-webapp.herokuapp.com/
+**Project Link** - https://video-conferencing-webapp.up.railway.app/
 
 
 **Demo Video** -  https://www.youtube.com/watch?v=e5gAgfXFh04
